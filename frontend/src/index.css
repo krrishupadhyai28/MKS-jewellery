@@ -1,32 +1,17 @@
-*{
-  margin:0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: sans-serif;
-}
-.container{
-  width: 100vw;
-  min-height: 100vh;
-  background: #ced8ff;
-  transition: 0.5s;
+@import "tailwindcss";
+
+body{
+    font-family: 'Poppins', sans-serif;
 }
 
-.container.dark{
-  background-color: black;
-
-  
-}
-.container {
-  width: 100vw;
-  min-height: 100vh;
-  /* Fixed: Loads your background image from the assets folder */
-  background-image: url('./assets/background.jpg'); 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  transition: 0.5s;
+.logo-font{
+    font-family:'Playfair Display', serif;
 }
 
-.container.dark {
-  /* Removed background-color: black so it doesn't hide your image */
+.hero-title{
+    font-family:'Playfair Display', serif;
+}
+
+.logo-font {
+  font-family: "Playfair Display", serif;
 }
