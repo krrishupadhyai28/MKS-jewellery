@@ -1,16 +1,13 @@
-import React, { useState } from 'react'
-import Navbar from './Components/Navbar/Navbar'
+import AppRouter from "./router/AppRouter";
+import ScrollToTopButton from "./components/ScrollToTopButton/ScrollToTopButton";
 
-const App = () => {
-
-  const [theme, setTheme] = useState('light');
-
+function App() {
   return (
-    <div className={`container ${theme}`}>
-      <Navbar theme={theme} setTheme={setTheme}/>
-      
-    </div>
-  )
+    <>
+      <AppRouter />
+      <ScrollToTopButton />
+    </>
+  );
 }
 
-export default App
+export default App;
