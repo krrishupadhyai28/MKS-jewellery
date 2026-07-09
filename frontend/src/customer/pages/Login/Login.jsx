@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiMail, FiLock } from "react-icons/fi";
+import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import MainLayout from "../../layouts/MainLayout";
 import { useCustomerAuth } from "../../context/CustomerAuthContext";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { GoogleLogin } from "@react-oauth/google";
+// import { GoogleLogin } from "@react-oauth/google";
 
 function LoginContent() {
   const navigate = useNavigate();
@@ -15,6 +15,8 @@ function LoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const from = location.state?.from?.pathname || "/";
 
@@ -92,14 +94,24 @@ function LoginContent() {
             <label className="mb-2 block font-medium text-gray-700">Password</label>
             <div className="flex items-center rounded-xl border border-gray-300 px-4 focus-within:border-[#C9A227] bg-white transition">
               <FiLock className="text-gray-400 shrink-0" />
+
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 className="w-full px-3 py-4 outline-none text-gray-800"
                 required
               />
+
+                          <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-gray-500 hover:text-[#C9A227] transition"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+              </button>
             </div>
           </div>
 
@@ -108,7 +120,10 @@ function LoginContent() {
               <input type="checkbox" className="accent-[#C9A227]" />
               Remember Me
             </label>
-            <Link to="#" className="text-sm text-[#C9A227] hover:underline font-medium">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-[#C9A227] hover:underline font-medium"
+            >
               Forgot Password?
             </Link>
           </div>
@@ -129,7 +144,7 @@ function LoginContent() {
           </div>
 
           {/* Corrected Google Button width setup */}
-          <div className="flex justify-center w-full">
+          {/* <div className="flex justify-center w-full">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => toast.error("Google Sign-In Cancelled")}
@@ -137,7 +152,7 @@ function LoginContent() {
               size="large"
               width="350" 
             />
-          </div>
+          </div> */}
         </form>
 
         <p className="mt-8 text-center text-sm text-gray-600">

@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { GoogleOAuthProvider } from "@react-oauth/google"; // 👈 Step 1: Import added
+// import { GoogleOAuthProvider } from "@react-oauth/google"; // 👈 Step 1: Import added
 
 import "./index.css";
 import App from "./App";
@@ -18,7 +18,7 @@ import { Toaster } from "react-hot-toast";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     {/* 👈 Step 2: Wrapped the entire app with GoogleOAuthProvider */}
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+    {/* <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}> */}
       <BrowserRouter>
         <QueryProvider>
           {/* Admin Authentication */}
@@ -43,6 +43,6 @@ createRoot(document.getElementById("root")).render(
           </AuthProvider>
         </QueryProvider>
       </BrowserRouter>
-    </GoogleOAuthProvider>
+    {/* </GoogleOAuthProvider> */}
   </StrictMode>
 );
