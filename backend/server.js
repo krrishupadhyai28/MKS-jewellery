@@ -38,6 +38,9 @@ const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, JWT_SECRET, (err, decodedUser) => {
     if (err) return res.status(403).json({ error: "Session expired." });
+    
+    console.log("DECODED USER:", decodedUser);
+
     req.user = decodedUser;
     next();
   });
