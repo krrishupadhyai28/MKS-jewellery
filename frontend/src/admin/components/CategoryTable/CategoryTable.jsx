@@ -23,19 +23,7 @@ function CategoryTable({
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Slug
-              </th>
-
-              <th className="px-6 py-4 text-center text-sm font-semibold">
-                Products
-              </th>
-
-              <th className="px-6 py-4 text-center text-sm font-semibold">
-                Featured
-              </th>
-
-              <th className="px-6 py-4 text-center text-sm font-semibold">
-                Status
+                Description
               </th>
 
               <th className="px-6 py-4 text-center text-sm font-semibold">
@@ -56,7 +44,7 @@ function CategoryTable({
             {loading ? (
               <tr>
                 <td
-                  colSpan="7"
+                  colSpan="4"
                   className="py-12 text-center text-gray-500"
                 >
                   Loading categories...
@@ -65,7 +53,7 @@ function CategoryTable({
             ) : categories.length === 0 ? (
               <tr>
                 <td
-                  colSpan="7"
+                  colSpan="4"
                   className="py-12 text-center text-gray-500"
                 >
                   No categories found.
@@ -74,7 +62,7 @@ function CategoryTable({
             ) : (
               categories.map((category) => (
                 <CategoryRow
-                  key={category.id}
+                  key={category.category_id}
                   category={category}
                   onView={onView}
                   onEdit={onEdit}

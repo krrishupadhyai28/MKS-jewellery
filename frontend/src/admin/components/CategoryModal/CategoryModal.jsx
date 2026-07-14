@@ -3,13 +3,11 @@ import api from "../../../services/api";
 import { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 
+// Updated initialState as per instructions
 const initialState = {
   name: "",
-  slug: "",
   description: "",
-  image: "",
-  featured: false,
-  status: "Active",
+  image_url: "",
 };
 
 function CategoryModal({
@@ -21,15 +19,13 @@ function CategoryModal({
   const [formData, setFormData] = useState(initialState);
   const [loading, setLoading] = useState(false);
 
+  // Updated useEffect to handle only name, description, and image
   useEffect(() => {
     if (category) {
       setFormData({
         name: category.name || "",
-        slug: category.slug || "",
         description: category.description || "",
-        image: category.image || "",
-        featured: category.featured || false,
-        status: category.status || "Active",
+        image_url: category.image_url || "",
       });
     } else {
       setFormData(initialState);
@@ -47,12 +43,12 @@ function CategoryModal({
     }));
   };
 
-  // Asynchronous Submissions & API Management (Step 1)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.slug) {
-      toast.error("Category Name and Slug are required");
+    // Updated validation to only check for name
+    if (!formData.name) {
+      toast.error("Category name is required");
       return;
     }
 
@@ -61,7 +57,7 @@ function CategoryModal({
 
       if (category) {
         await api.put(
-          `/api/admin/categories/${category.id}`,
+          `/api/admin/categories/${category.category_id}`,
           formData
         );
         toast.success("Category updated successfully");
@@ -119,8 +115,8 @@ function CategoryModal({
           className="grid grid-cols-1 gap-6 p-8 md:grid-cols-2"
         >
 
-          {/* Name */}
-          <div>
+          {/* Name - Now spans full width on medium screens because slug is removed */}
+          <div className="md:col-span-2">
             <label className="mb-2 block font-medium">
               Category Name
             </label>
@@ -129,36 +125,24 @@ function CategoryModal({
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Rings"
+              placeholder="Enter category name"
               className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#C9A227]"
               required
             />
           </div>
 
-          {/* Slug */}
-          <div>
+          {/* Image URL Input (Replaced File Upload) */}
+          <div className="md:col-span-2">
             <label className="mb-2 block font-medium">
-              Slug
+              Image URL
             </label>
             <input
               type="text"
-              name="slug"
-              value={formData.slug}
+              name="image_url"
+              value={formData.image_url}
               onChange={handleChange}
-              placeholder="rings"
+              placeholder="https://example.com/image.jpg"
               className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#C9A227]"
-              required
-            />
-          </div>
-
-          {/* Image */}
-          <div className="md:col-span-2">
-            <label className="mb-2 block font-medium">
-              Category Image
-            </label>
-            <input
-              type="file"
-              className="w-full rounded-xl border border-dashed border-gray-300 p-3"
             />
           </div>
 
@@ -177,38 +161,6 @@ function CategoryModal({
             />
           </div>
 
-          {/* Featured */}
-          <div>
-            <label className="mb-2 block font-medium">
-              Featured
-            </label>
-            <label className="flex items-center gap-3 rounded-xl border border-gray-300 px-4 py-3">
-              <input
-                type="checkbox"
-                name="featured"
-                checked={formData.featured}
-                onChange={handleChange}
-              />
-              Featured Category
-            </label>
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="mb-2 block font-medium">
-              Status
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#C9A227]"
-            >
-              <option>Active</option>
-              <option>Inactive</option>
-            </select>
-          </div>
-
           {/* Footer */}
           <div className="flex justify-end gap-4 md:col-span-2">
             <button
@@ -219,7 +171,6 @@ function CategoryModal({
               Cancel
             </button>
 
-            {/* Submit Button with Loading Feedback (Step 2) */}
             <button
               type="submit"
               disabled={loading}

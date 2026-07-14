@@ -14,16 +14,13 @@ function DeleteCategoryModal({
       <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl">
 
         {/* Header */}
-
         <div className="flex flex-col items-center border-b px-8 py-6">
 
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
-
             <FaExclamationTriangle
               size={36}
               className="text-red-600"
             />
-
           </div>
 
           <h2 className="mt-5 text-2xl font-bold text-gray-900">
@@ -46,49 +43,40 @@ function DeleteCategoryModal({
         </div>
 
         {/* Details */}
-
         <div className="space-y-4 px-8 py-6">
 
-          <div className="flex justify-between">
-
+          <div className="flex justify-between gap-4">
             <span className="text-gray-500">
-              Slug
+              Category ID
             </span>
-
             <span className="font-medium">
-              {category.slug}
+              #{category.category_id}
             </span>
-
           </div>
 
-          <div className="flex justify-between">
-
+          <div className="flex justify-between gap-4">
             <span className="text-gray-500">
-              Products
+              Created
             </span>
-
             <span className="font-medium">
-              {category.products}
+              {category.created_at
+                ? new Date(category.created_at).toLocaleDateString("en-IN")
+                : "—"}
             </span>
-
           </div>
 
-          <div className="flex justify-between">
-
-            <span className="text-gray-500">
-              Status
-            </span>
-
-            <span className="font-medium">
-              {category.status}
-            </span>
-
+          <div>
+            <p className="mb-2 text-gray-500">
+              Description
+            </p>
+            <p className="rounded-lg bg-gray-50 p-3 text-sm text-gray-700">
+              {category.description || "No description available."}
+            </p>
           </div>
 
         </div>
 
         {/* Footer */}
-
         <div className="flex justify-end gap-4 border-t px-8 py-5">
 
           <button

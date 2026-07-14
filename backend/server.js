@@ -220,6 +220,288 @@ app.get("/api/categories", async (req, res) => {
   }
 });
 
+// ================================
+// ADMIN CATEGORIES
+// ================================
+
+app.get("/api/admin/categories", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        category_id,
+        name,
+        description,
+        image_url,
+        created_at
+      FROM categories
+      ORDER BY created_at DESC
+    `);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Failed to fetch categories"
+    });
+  }
+});
+
+// ======================================
+// ADD CATEGORY
+// ======================================
+app.post("/api/admin/categories", async (req, res) => {
+  try {
+    const { name, description, image_url } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        error: "Category name is required",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO categories
+      (name, description, image_url)
+      VALUES ($1, $2, $3)
+      RETURNING *
+      `,
+      [
+        name,
+        description || "",
+        image_url || "",
+      ]
+    );
+
+    res.status(201).json(result.rows[0]);
+
+  } catch (err) {
+    console.error(err);
+
+    if (err.code === "23505") {
+      return res.status(400).json({
+        error: "Category already exists",
+      });
+    }
+
+    res.status(500).json({
+      error: "Failed to create category",
+    });
+  }
+});
+
+// ======================================
+// DELETE CATEGORY
+// ======================================
+app.delete("/api/admin/categories/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      DELETE FROM categories
+      WHERE category_id = $1
+      RETURNING *
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Category not found",
+      });
+    }
+
+    res.json({
+      message: "Category deleted successfully",
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Failed to delete category",
+    });
+  }
+}); 
+
+// ======================================
+// UPDATE CATEGORY
+// ======================================
+app.put("/api/admin/categories/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, image_url } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        error: "Category name is required",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE categories
+      SET
+        name = $1,
+        description = $2,
+        image_url = $3
+      WHERE category_id = $4
+      RETURNING *
+      `,
+      [
+        name,
+        description || "",
+        image_url || "",
+        id,
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Category not found",
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Failed to update category",
+    });
+  }
+});
+
+// ======================================
+// ADMIN ORDERS
+// ======================================
+app.get("/api/admin/orders", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        o.order_id,
+        o.user_id,
+        o.total_amount,
+        o.status,
+        o.payment_status,
+        o.created_at,
+        u.full_name,
+        u.email
+      FROM orders o
+      JOIN users u
+        ON o.user_id = u.id
+      ORDER BY o.created_at DESC
+    `);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Failed to fetch orders",
+    });
+  }
+});
+
+// ======================================
+// UPDATE ORDER STATUS
+// ======================================
+app.put("/api/admin/orders/:id", async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      UPDATE orders
+      SET
+        status = $1,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE order_id = $2
+      RETURNING *
+      `,
+      [status, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Order not found",
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Failed to update order status",
+    });
+  }
+});
+
+// ======================================
+// GET SINGLE ORDER
+// ======================================
+
+app.get("/api/admin/orders/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      SELECT
+        o.order_id,
+        o.total_amount,
+        o.status,
+        o.payment_status,
+        o.created_at,
+
+        u.full_name,
+        u.email,
+
+        a.phone,
+        a.address_line1,
+        a.address_line2,
+        a.city,
+        a.state,
+        a.pincode
+
+      FROM orders o
+
+      JOIN users u
+      ON o.user_id = u.id
+
+      LEFT JOIN addresses a
+      ON o.address_id = a.address_id
+
+      WHERE o.order_id = $1
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Order not found",
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Failed to fetch order details",
+    });
+  }
+});
+
+
 // ==========================================
 // WISHLIST APIs
 // ==========================================
@@ -260,41 +542,108 @@ app.delete("/api/cart/:id", authenticateToken, async (req, res) => {
 });
 
 // ==========================================
-// CHECKOUT & ORDERS ENGINE APIs
+// CHECKOUT & ORDERS ENGINE APIs (UPDATED)
 // ==========================================
+
+// 1. PLACE A NEW ORDER
 app.post("/api/orders", authenticateToken, async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    const cart = await client.query("SELECT c.*, p.price FROM cart_items c JOIN products p ON c.product_id = p.id WHERE c.user_id = $1", [req.user.id]);
-    if (cart.rows.length === 0) return res.status(400).json({ error: "Cart is empty." });
 
-    const total = cart.rows.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+    // Fetch cart items joining with product_catalogue to get correct price
+    const cart = await client.query(
+      `SELECT c.*, p.discounted_price 
+       FROM cart_items c 
+       JOIN product_catalogue p ON c.product_id = p.product_id 
+       WHERE c.user_id = $1`,
+      [req.user.id]
+    );
+
+    if (cart.rows.length === 0) {
+      return res.status(400).json({ error: "Cart is empty." });
+    }
+
+    // Calculate total using discounted_price
+    const total = cart.rows.reduce(
+      (sum, item) => sum + (parseFloat(item.discounted_price) * item.quantity), 
+      0
+    );
+
+    // Insert into orders using order_id and lowercase 'pending'
     const orderResult = await client.query(
-      "INSERT INTO orders (user_id, total_amount, status) VALUES ($1, $2, 'PENDING') RETURNING id",
+      `INSERT INTO orders (user_id, total_amount, status) 
+       VALUES ($1, $2, 'pending') 
+       RETURNING order_id`,
       [req.user.id, total]
     );
-    const orderId = orderResult.rows[0].id;
+    const orderId = orderResult.rows[0].order_id;
 
+    // Insert items using price_at_purchase and discounted_price
     for (let item of cart.rows) {
-      await client.query("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ($1, $2, $3, $4)", [orderId, item.product_id, item.quantity, item.price]);
+      await client.query(
+        `INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase) 
+         VALUES ($1, $2, $3, $4)`,
+        [orderId, item.product_id, item.quantity, item.discounted_price]
+      );
     }
+
+    // Clear the cart
     await client.query("DELETE FROM cart_items WHERE user_id = $1", [req.user.id]);
+    
     await client.query("COMMIT");
     res.status(201).json({ message: "Order placed!", orderId });
-  } catch (err) { await client.query("ROLLBACK"); res.status(500).json({ error: "Checkout failed." }); }
-  finally { client.release(); }
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Checkout Error:", err);
+    res.status(500).json({ error: "Checkout failed." });
+  } finally {
+    client.release();
+  }
 });
 
+// 2. GET ALL ORDERS FOR A USER
 app.get("/api/orders", authenticateToken, async (req, res) => {
-  const o = await pool.query("SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC", [req.user.id]);
-  res.json(o.rows);
+  try {
+    // order_id use ho raha hai internal queries me, pure row details fetch karne ke liye
+    const o = await pool.query(
+      "SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC", 
+      [req.user.id]
+    );
+    res.json(o.rows);
+  } catch (err) {
+    console.error("Fetch Orders Error:", err);
+    res.status(500).json({ error: "Failed to fetch orders." });
+  }
 });
 
+// 3. GET ORDER DETAILS BY ID
 app.get("/api/orders/:id", authenticateToken, async (req, res) => {
-  const order = await pool.query("SELECT * FROM orders WHERE id = $1 AND user_id = $2", [req.params.id, req.user.id]);
-  const items = await pool.query("SELECT oi.*, p.title FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = $1", [req.params.id]);
-  res.json({ order: order.rows[0], items: items.rows });
+  try {
+    // orders table me primary key ab order_id hai
+    const order = await pool.query(
+      "SELECT * FROM orders WHERE order_id = $1 AND user_id = $2", 
+      [req.params.id, req.user.id]
+    );
+
+    if (order.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found." });
+    }
+
+    // Fetch items with updated join on product_catalogue including title and image_url
+    const items = await pool.query(
+      `SELECT oi.*, p.title, p.image_url 
+       FROM order_items oi 
+       JOIN product_catalogue p ON oi.product_id = p.product_id 
+       WHERE oi.order_id = $1`, 
+      [req.params.id]
+    );
+
+    res.json({ order: order.rows[0], items: items.rows });
+  } catch (err) {
+    console.error("Fetch Order Details Error:", err);
+    res.status(500).json({ error: "Failed to fetch order details." });
+  }
 });
 
 // ==========================================

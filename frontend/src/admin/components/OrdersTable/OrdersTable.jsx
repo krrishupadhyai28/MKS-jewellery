@@ -1,7 +1,8 @@
 import OrderRow from "../OrderRow/OrderRow";
-import { ordersData } from "../../data/ordersData";
 
 function OrdersTable({
+  orders,
+  loading,
   onView,
   onStatus,
 }) {
@@ -25,15 +26,7 @@ function OrdersTable({
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
-                Product
-              </th>
-
-              <th className="px-6 py-4 text-left text-sm font-semibold">
                 Amount
-              </th>
-
-              <th className="px-6 py-4 text-left text-sm font-semibold">
-                Payment
               </th>
 
               <th className="px-6 py-4 text-left text-sm font-semibold">
@@ -54,14 +47,34 @@ function OrdersTable({
 
           <tbody>
 
-            {ordersData.map((order) => (
-              <OrderRow
-                key={order.id}
-                order={order}
-                onView={onView}
-                onStatus={onStatus}
-              />
-            ))}
+            {loading ? (
+              <tr>
+                <td
+                  colSpan="6"
+                  className="py-10 text-center text-gray-500"
+                >
+                  Loading orders...
+                </td>
+              </tr>
+            ) : orders.length === 0 ? (
+              <tr>
+                <td
+                  colSpan="6"
+                  className="py-10 text-center text-gray-500"
+                >
+                  No orders found.
+                </td>
+              </tr>
+            ) : (
+              orders.map((order) => (
+                <OrderRow
+                  key={order.order_id}
+                  order={order}
+                  onView={onView}
+                  onStatus={onStatus}
+                />
+              ))
+            )}
 
           </tbody>
 
