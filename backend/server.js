@@ -2541,7 +2541,10 @@ app.put(
 );
 
 // Vercel Entry Wrapper Engine Hook
-if (process.env.NODE_ENV !== "production") {
-  app.listen(3000, () => console.log("Jewellery Full-Stack Server processing on port 3000"));
-}
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
 module.exports = app;
